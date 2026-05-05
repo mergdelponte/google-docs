@@ -23,6 +23,7 @@ let parkourState = {
     player: { x: 100, y: 400, width: 25, height: 40, health: 100, velocityY: 0, velocityX: 0, jumping: false },
     platforms: [],
     coins: [],
+    missiles: [],
     score: 0,
     keys: {},
     gameRunning: false,
@@ -245,6 +246,7 @@ function gameLoopShooter() {
 function initParkourGame() {
     parkourState.platforms = [];
     parkourState.coins = [];
+    parkourState.missiles = [];
     parkourState.score = 0;
     parkourState.keys = {};
     parkourState.gameRunning = true;
@@ -290,6 +292,7 @@ function handleParkourKeyUp(e) {
 function generateParkourLevel() {
     parkourState.platforms = [];
     parkourState.coins = [];
+    parkourState.missiles = [];
 
     // Add ground/starting platform
     parkourState.platforms.push({ x: 0, y: 550, width: 150, height: 50 });
@@ -307,6 +310,19 @@ function generateParkourLevel() {
         
         if (Math.random() > 0.5) {
             parkourState.coins.push({ x: x + width / 2, y: y - 40, radius: 8, collected: false });
+        }
+        
+        // Add missiles on some platforms
+        if (Math.random() > 0.7) {
+            parkourState.missiles.push({ 
+                x: x + width / 2, 
+                y: y - 30, 
+                vx: (Math.random() - 0.5) * 4, 
+                vy: (Math.random() - 0.5) * 2,
+                width: 15,
+                height: 8,
+                angle: 0
+            });
         }
     }
 }
@@ -332,6 +348,28 @@ function updateParkourGame() {
                 parkourState.player.jumping = false;
                 isOnGround = true;
             }
+        }
+    }
+
+    // Update missiles
+    for (let i = parkourState.missiles.length - 1; i >= 0; i--) {
+        const missile = parkourState.missiles[i];
+        
+        missile.x += missile.vx;
+        missile.y += missile.vy;
+        missile.vy += 0.3; // Gravity on missiles
+        missile.angle += 0.1;
+        
+        // Remove if off screen
+        if (missile.x < -50 || missile.x > parkourCanvas.width + 50 || missile.y > parkourCanvas.height + 50) {
+            parkourState.missiles.splice(i, 1);
+            continue;
+        }
+        
+        // Check collision with player
+        if (checkRectCollision(parkourState.player, missile)) {
+            parkourState.player.health -= 15;
+            parkourState.missiles.splice(i, 1);
         }
     }
 
@@ -393,6 +431,26 @@ function drawParkourGame() {
             parkourCtx.lineWidth = 2;
             parkourCtx.strokeRect(screenX, platform.y, platform.width, platform.height);
         }
+    }
+
+    // Draw missiles
+    for (let missile of parkourState.missiles) {
+        const screenX = missile.x - parkourState.scrollX;
+        const screenY = missile.y;
+        
+        parkourCtx.save();
+        parkourCtx.translate(screenX, screenY);
+        parkourCtx.rotate(missile.angle);
+        
+        // Missile body
+        parkourCtx.fillStyle = '#ff4444';
+        parkourCtx.fillRect(-missile.width / 2, -missile.height / 2, missile.width, missile.height);
+        
+        // Missile fire trail
+        parkourCtx.fillStyle = '#ffaa00';
+        parkourCtx.fillRect(-missile.width / 2 - 8, -missile.height / 2 + 2, 8, missile.height - 4);
+        
+        parkourCtx.restore();
     }
 
     // Draw coins
