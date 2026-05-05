@@ -1,1 +1,148 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
 
+body {
+    font-family: 'Arial', sans-serif;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    color: #fff;
+}
+
+.menu {
+    text-align: center;
+    padding: 40px;
+}
+
+.menu-content {
+    background: rgba(0, 0, 0, 0.7);
+    padding: 60px 40px;
+    border-radius: 20px;
+    box-shadow: 0 8px 32px rgba(31, 38, 135, 0.37);
+    backdrop-filter: blur(4px);
+}
+
+.menu h1 {
+    font-size: 3.5em;
+    margin-bottom: 30px;
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+    animation: bounce 2s infinite;
+}
+
+@keyframes bounce {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-20px); }
+}
+
+.menu p {
+    font-size: 1.5em;
+    margin-bottom: 30px;
+    opacity: 0.9;
+}
+
+.menu-btn {
+    display: block;
+    width: 300px;
+    margin: 15px auto;
+    padding: 20px;
+    font-size: 1.2em;
+    font-weight: bold;
+    background: linear-gradient(45deg, #667eea, #764ba2);
+    color: white;
+    border: none;
+    border-radius: 10px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+}
+
+.menu-btn:hover {
+    transform: scale(1.05);
+    box-shadow: 0 6px 20px rgba(102, 126, 234, 0.4);
+}
+
+.menu-btn:active {
+    transform: scale(0.98);
+}
+
+.game-container {
+    width: 100%;
+    max-width: 900px;
+    background: rgba(0, 0, 0, 0.8);
+    padding: 20px;
+    border-radius: 15px;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5);
+}
+
+.game-container.hidden {
+    display: none;
+}
+
+.game-ui {
+    display: flex;
+    justify-content: space-around;
+    margin-bottom: 15px;
+    font-size: 1.2em;
+    color: #00ff00;
+    text-shadow: 0 0 10px #00ff00;
+}
+
+canvas {
+    display: block;
+    margin: 0 auto;
+    background: #1a1a2e;
+    border: 3px solid #667eea;
+    border-radius: 10px;
+    width: 100%;
+    height: auto;
+    max-width: 100%;
+}
+
+.game-controls {
+    text-align: center;
+    margin: 15px 0;
+    font-size: 0.9em;
+    opacity: 0.7;
+    color: #aaa;
+}
+
+.back-btn {
+    display: block;
+    margin: 15px auto 0;
+    padding: 12px 30px;
+    font-size: 1em;
+    background: #667eea;
+    color: white;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.back-btn:hover {
+    background: #764ba2;
+    transform: translateX(-5px);
+}
+
+@media (max-width: 900px) {
+    .menu-content {
+        padding: 40px 20px;
+    }
+
+    .menu h1 {
+        font-size: 2.5em;
+    }
+
+    .menu-btn {
+        width: 100%;
+    }
+
+    canvas {
+        max-height: 400px;
+    }
+}
