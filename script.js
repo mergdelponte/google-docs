@@ -243,7 +243,6 @@ function gameLoopShooter() {
 
 // ===== PARKOUR GAME FUNCTIONS =====
 function initParkourGame() {
-    parkourState.player = { x: 100, y: 400, width: 25, height: 40, health: 100, velocityY: 0, velocityX: 0, jumping: false };
     parkourState.platforms = [];
     parkourState.coins = [];
     parkourState.score = 0;
@@ -251,10 +250,24 @@ function initParkourGame() {
     parkourState.gameRunning = true;
     parkourState.scrollX = 0;
 
+    generateParkourLevel();
+    
+    // Place player on first platform after level is generated
+    const firstPlatform = parkourState.platforms[0];
+    parkourState.player = { 
+        x: firstPlatform.x + 20, 
+        y: firstPlatform.y - 40, 
+        width: 25, 
+        height: 40, 
+        health: 100, 
+        velocityY: 0, 
+        velocityX: 0, 
+        jumping: false 
+    };
+
     document.addEventListener('keydown', handleParkourKeyDown);
     document.addEventListener('keyup', handleParkourKeyUp);
 
-    generateParkourLevel();
     gameLoopParkour();
 }
 
@@ -278,12 +291,12 @@ function generateParkourLevel() {
     parkourState.platforms = [];
     parkourState.coins = [];
 
-    // Add ground at bottom
-    parkourState.platforms.push({ x: 0, y: 550, width: 200, height: 50 });
+    // Add ground/starting platform
+    parkourState.platforms.push({ x: 0, y: 550, width: 150, height: 50 });
 
-    // Generate platforms
+    // Generate platforms ahead
     for (let i = 0; i < 20; i++) {
-        const x = i * 200 + 200;
+        const x = i * 200 + 250;
         const y = Math.random() * 250 + 250;
         const width = 120 + Math.random() * 80;
         
