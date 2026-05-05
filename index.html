@@ -1,5 +1,48 @@
-<html>
-  <body>
-    <h1>Hi!</h1>
-  </body>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gaming Hub - Shooter & Parkour</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div id="mainMenu" class="menu">
+        <div class="menu-content">
+            <h1>🎮 Gaming Hub</h1>
+            <p>Choose a Game:</p>
+            <button class="menu-btn" onclick="startShooter()">🎯 Shooter Game</button>
+            <button class="menu-btn" onclick="startParkour()">🏃 Parkour Runner</button>
+        </div>
+    </div>
+
+    <!-- SHOOTER GAME -->
+    <div id="shooterContainer" class="game-container hidden">
+        <div id="shooterUI" class="game-ui">
+            <div>Score: <span id="shooterScore">0</span></div>
+            <div>Health: <span id="playerHealth">100</span></div>
+            <div>Ammo: <span id="ammo">30</span></div>
+        </div>
+        <canvas id="shooterCanvas" width="800" height="600"></canvas>
+        <div class="game-controls">
+            <p>WASD to Move | Mouse to Aim & Click to Shoot | R to Reload | ESC to Menu</p>
+        </div>
+        <button class="back-btn" onclick="backToMenu()">← Back to Menu</button>
+    </div>
+
+    <!-- PARKOUR GAME -->
+    <div id="parkourContainer" class="game-container hidden">
+        <div id="parkourUI" class="game-ui">
+            <div>Distance: <span id="parkourScore">0</span>m</div>
+            <div>Health: <span id="playerHealthParkour">100</span></div>
+        </div>
+        <canvas id="parkourCanvas" width="800" height="600"></canvas>
+        <div class="game-controls">
+            <p>Arrow Keys or A/D to Move | SPACE to Jump | ESC to Menu</p>
+        </div>
+        <button class="back-btn" onclick="backToMenu()">← Back to Menu</button>
+    </div>
+
+    <script src="script.js"></script>
+</body>
 </html>
