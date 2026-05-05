@@ -21,7 +21,7 @@ const parkourCtx = parkourCanvas.getContext('2d');
 
 let parkourState = {
     player: { x: 100, y: 400, width: 25, height: 40, health: 100, velocityY: 0, velocityX: 0, jumping: false },
-    obstacles: [],
+    platforms: [],
     coins: [],
     score: 0,
     keys: {},
@@ -244,7 +244,7 @@ function gameLoopShooter() {
 // ===== PARKOUR GAME FUNCTIONS =====
 function initParkourGame() {
     parkourState.player = { x: 100, y: 400, width: 25, height: 40, health: 100, velocityY: 0, velocityX: 0, jumping: false };
-    parkourState.obstacles = [];
+    parkourState.platforms = [];
     parkourState.coins = [];
     parkourState.score = 0;
     parkourState.keys = {};
@@ -275,18 +275,22 @@ function handleParkourKeyUp(e) {
 }
 
 function generateParkourLevel() {
-    parkourState.obstacles = [];
+    parkourState.platforms = [];
     parkourState.coins = [];
 
+    // Add ground at bottom
+    parkourState.platforms.push({ x: 0, y: 550, width: 200, height: 50 });
+
+    // Generate platforms
     for (let i = 0; i < 20; i++) {
         const x = i * 200 + 200;
-        const y = Math.random() * 200 + 300;
-        const width = 100 + Math.random() * 100;
+        const y = Math.random() * 250 + 250;
+        const width = 120 + Math.random() * 80;
         
-        parkourState.obstacles.push({ x, y, width, height: 40 });
+        parkourState.platforms.push({ x, y, width, height: 20 });
         
         if (Math.random() > 0.5) {
-            parkourState.coins.push({ x: x + width / 2, y: y - 50, radius: 8, collected: false });
+            parkourState.coins.push({ x: x + width / 2, y: y - 40, radius: 8, collected: false });
         }
     }
 }
@@ -294,19 +298,20 @@ function generateParkourLevel() {
 function updateParkourGame() {
     // Movement
     parkourState.player.velocityX = 0;
-    if (parkourState.keys['a'] || parkourState.keys['arrowleft']) parkourState.player.velocityX = -4;
-    if (parkourState.keys['d'] || parkourState.keys['arrowright']) parkourState.player.velocityX = 4;
+    if (parkourState.keys['a'] || parkourState.keys['arrowleft']) parkourState.player.velocityX = -5;
+    if (parkourState.keys['d'] || parkourState.keys['arrowright']) parkourState.player.velocityX = 5;
 
     parkourState.player.x += parkourState.player.velocityX;
     parkourState.player.velocityY += parkourState.gravity;
     parkourState.player.y += parkourState.player.velocityY;
 
-    // Check collision with obstacles
+    // Check collision with platforms
     let isOnGround = false;
-    for (let obstacle of parkourState.obstacles) {
-        if (checkRectCollision(parkourState.player, obstacle)) {
-            if (parkourState.player.velocityY >= 0) {
-                parkourState.player.y = obstacle.y - parkourState.player.height;
+    for (let platform of parkourState.platforms) {
+        if (checkRectCollision(parkourState.player, platform)) {
+            // Landing on top of platform
+            if (parkourState.player.velocityY >= 0 && parkourState.player.y + parkourState.player.height - parkourState.player.velocityY <= platform.y + 10) {
+                parkourState.player.y = platform.y - parkourState.player.height;
                 parkourState.player.velocityY = 0;
                 parkourState.player.jumping = false;
                 isOnGround = true;
@@ -345,16 +350,32 @@ function drawParkourGame() {
     parkourCtx.fillStyle = '#1a1a2e';
     parkourCtx.fillRect(0, 0, parkourCanvas.width, parkourCanvas.height);
 
-    // Draw sky
-    parkourCtx.fillStyle = '#2a2a4e';
+    // Draw sky gradient
+    const gradient = parkourCtx.createLinearGradient(0, 0, 0, 300);
+    gradient.addColorStop(0, '#2a2a4e');
+    gradient.addColorStop(1, '#1a1a2e');
+    parkourCtx.fillStyle = gradient;
     parkourCtx.fillRect(0, 0, parkourCanvas.width, 300);
 
-    // Draw obstacles
-    parkourCtx.fillStyle = '#667eea';
-    for (let obstacle of parkourState.obstacles) {
-        const screenX = obstacle.x - parkourState.scrollX;
-        if (screenX > -obstacle.width && screenX < parkourCanvas.width) {
-            parkourCtx.fillRect(screenX, obstacle.y, obstacle.width, obstacle.height);
+    // Draw platforms with shadow effect
+    for (let platform of parkourState.platforms) {
+        const screenX = platform.x - parkourState.scrollX;
+        if (screenX > -platform.width && screenX < parkourCanvas.width) {
+            // Platform shadow
+            parkourCtx.fillStyle = 'rgba(0, 0, 0, 0.3)';
+            parkourCtx.fillRect(screenX, platform.y + platform.height + 3, platform.width, 5);
+            
+            // Platform with gradient
+            const platGradient = parkourCtx.createLinearGradient(screenX, platform.y, screenX, platform.y + platform.height);
+            platGradient.addColorStop(0, '#667eea');
+            platGradient.addColorStop(1, '#4c4c99');
+            parkourCtx.fillStyle = platGradient;
+            parkourCtx.fillRect(screenX, platform.y, platform.width, platform.height);
+            
+            // Platform border
+            parkourCtx.strokeStyle = '#88aaff';
+            parkourCtx.lineWidth = 2;
+            parkourCtx.strokeRect(screenX, platform.y, platform.width, platform.height);
         }
     }
 
@@ -366,6 +387,13 @@ function drawParkourGame() {
             parkourCtx.beginPath();
             parkourCtx.arc(screenX, coin.y, coin.radius, 0, Math.PI * 2);
             parkourCtx.fill();
+            
+            // Coin shine
+            parkourCtx.strokeStyle = '#ffff99';
+            parkourCtx.lineWidth = 2;
+            parkourCtx.beginPath();
+            parkourCtx.arc(screenX, coin.y, coin.radius + 3, 0, Math.PI * 2);
+            parkourCtx.stroke();
         }
     }
 
@@ -373,6 +401,11 @@ function drawParkourGame() {
     parkourCtx.fillStyle = '#00ff00';
     const playerScreenX = parkourState.player.x - parkourState.scrollX;
     parkourCtx.fillRect(playerScreenX, parkourState.player.y, parkourState.player.width, parkourState.player.height);
+    
+    // Player eyes
+    parkourCtx.fillStyle = '#000000';
+    parkourCtx.fillRect(playerScreenX + 5, parkourState.player.y + 10, 4, 4);
+    parkourCtx.fillRect(playerScreenX + 16, parkourState.player.y + 10, 4, 4);
 
     // Update UI
     document.getElementById('parkourScore').textContent = Math.floor(parkourState.score / 10);
