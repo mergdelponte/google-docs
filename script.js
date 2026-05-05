@@ -300,29 +300,60 @@ function generateParkourLevel() {
     // Second platform - positioned to be reachable with a good jump
     parkourState.platforms.push({ x: 180, y: 450, width: 130, height: 20 });
 
-    // Generate more platforms ahead
+    // Generate more platforms ahead with reachability checks
+    let lastPlatform = parkourState.platforms[parkourState.platforms.length - 1];
+    
     for (let i = 0; i < 18; i++) {
-        const x = i * 200 + 380;
-        const y = Math.random() * 250 + 250;
-        const width = 120 + Math.random() * 80;
+        let platformFound = false;
+        let attempts = 0;
+        let newPlatform;
         
-        parkourState.platforms.push({ x, y, width, height: 20 });
-        
-        if (Math.random() > 0.5) {
-            parkourState.coins.push({ x: x + width / 2, y: y - 40, radius: 8, collected: false });
+        // Keep trying until we find a reachable platform position
+        while (!platformFound && attempts < 10) {
+            const x = lastPlatform.x + 120 + Math.random() * 150; // Horizontal distance within jumping range
+            const y = lastPlatform.y - 50 + Math.random() * 100; // Vertical distance reachable with jump
+            const width = 100 + Math.random() * 80;
+            
+            newPlatform = { x, y, width, height: 20 };
+            
+            // Check if platform is reachable (horizontal distance and vertical drop/rise within limits)
+            const horizontalDist = x - (lastPlatform.x + lastPlatform.width / 2);
+            const verticalDist = lastPlatform.y - y;
+            
+            // Allow jumps up to 250 pixels horizontally and vertical drop/rise of 150 pixels
+            if (horizontalDist > 30 && horizontalDist < 250 && verticalDist > -100 && verticalDist < 150) {
+                platformFound = true;
+            }
+            
+            attempts++;
         }
         
-        // Add missiles on some platforms
-        if (Math.random() > 0.7) {
-            parkourState.missiles.push({ 
-                x: x + width / 2, 
-                y: y - 30, 
-                vx: (Math.random() - 0.5) * 4, 
-                vy: (Math.random() - 0.5) * 2,
-                width: 15,
-                height: 8,
-                angle: 0
-            });
+        if (platformFound) {
+            parkourState.platforms.push(newPlatform);
+            lastPlatform = newPlatform;
+            
+            // Add coins
+            if (Math.random() > 0.5) {
+                parkourState.coins.push({ 
+                    x: newPlatform.x + newPlatform.width / 2, 
+                    y: newPlatform.y - 40, 
+                    radius: 8, 
+                    collected: false 
+                });
+            }
+            
+            // Add missiles on some platforms
+            if (Math.random() > 0.7) {
+                parkourState.missiles.push({ 
+                    x: newPlatform.x + newPlatform.width / 2, 
+                    y: newPlatform.y - 30, 
+                    vx: (Math.random() - 0.5) * 4, 
+                    vy: (Math.random() - 0.5) * 2,
+                    width: 15,
+                    height: 8,
+                    angle: 0
+                });
+            }
         }
     }
 }
