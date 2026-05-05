@@ -294,9 +294,12 @@ function generateParkourLevel() {
     // Add ground/starting platform
     parkourState.platforms.push({ x: 0, y: 550, width: 150, height: 50 });
 
-    // Generate platforms ahead
-    for (let i = 0; i < 20; i++) {
-        const x = i * 200 + 250;
+    // Second platform - positioned to be reachable with a good jump
+    parkourState.platforms.push({ x: 180, y: 450, width: 130, height: 20 });
+
+    // Generate more platforms ahead
+    for (let i = 0; i < 18; i++) {
+        const x = i * 200 + 380;
         const y = Math.random() * 250 + 250;
         const width = 120 + Math.random() * 80;
         
